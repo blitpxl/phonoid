@@ -1,0 +1,361 @@
+/* Top level widget */
+
+
+QLineEdit {
+    background: #2E3231;
+    color: white;
+    font-size: 14px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 4px;
+}
+
+QLineEdit:focus {
+    border: 2px solid #0D99FF;
+}
+
+QTextEdit {
+    background: #2E3231;
+    color: white;
+    font-size: 14px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 4px;
+}
+
+QTextEdit:focus {
+    border: 2px solid #0D99FF;
+}
+
+QLabel {
+    color: white;
+    font-size: 13px;
+}
+
+
+/* Top level window */
+
+QPushButton#main-window {
+    background: #212423;
+    border: 1px solid #4F5654;
+    border-radius: 8px;
+    outline: 0;
+}
+
+QFrame#window-title-notch {
+    background: #4F5654;
+    border-bottom-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+QFrame#window-title-notch QLabel {
+    color: white;
+    font-size: 12px;
+}
+
+QPushButton#control-close {
+    background: #FF544D;
+    border-radius: 6px;
+}
+
+QPushButton#control-size {
+    background: #FEB429;
+    border-radius: 6px;
+}
+
+QPushButton#control-minimize {
+    background: #24C138;
+    border-radius: 6px;
+}
+
+QSizeGrip {
+    background: transparent;
+}
+
+QFrame#side-grip {
+    background: transparent;
+}
+
+QToolTip {
+    background: #212423;
+    color: white;
+    font-size: 12px;
+    border: 1px solid #4F5654;
+}
+
+
+/* Dialog */
+
+
+QPushButton#ok-button {
+    background: #29C48C;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+}
+
+QPushButton#cancel-button {
+    background: #C43C29;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+}
+
+
+/* Side Tab */
+
+
+QFrame#side-tab {
+    background: #2E3231;
+    border-radius: 25px;
+}
+
+QFrame#side-tab QPushButton{
+    background: transparent;
+}
+
+QFrame#side-tab QFrame {
+    border: none;
+    background-color: #212423;
+}
+
+
+/* Player Panel */
+
+
+/* Player Info */
+QFrame#player-info-frame {
+    background: #2E3231;
+    border-radius: 32px;
+}
+
+
+QFrame#player-info-frame QLabel#player-info-track-title {
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+QFrame#player-info-frame QLabel#player-info-track-artist {
+    color: #9FA5A3;
+    font-size: 11px;
+}
+
+/* Player Controller */
+
+QFrame#player-controller-frame {
+    background: #2E3231;
+    border-radius: 16px;
+}
+
+QFrame#player-controller-frame QPushButton{
+    background: transparent;
+}
+
+QFrame#player-controller-frame QPushButton:hover{
+    border: none;
+    background: #3B403F;
+    border-radius: 15;
+}
+
+/* Playback Controller */
+
+QFrame#playback-controller-frame {
+    background: #2E3231;
+    border-radius: 16px;
+}
+
+QFrame#playback-controller-frame QPushButton{
+    background: transparent;
+}
+
+QFrame#playback-controller-frame QPushButton:hover{
+    border: none;
+    background: #3B403F;
+    border-radius: 15;
+}
+
+/* Seekbar */
+
+QFrame#seekbar-frame {
+    background: #2E3231;
+    border-radius: 12px;
+}
+
+QSlider::groove:horizontal {
+	background-color: #212423;
+	border: 0px solid #424242;
+	height: 8px;
+	border-radius: 4px;
+}
+
+QSlider::sub-page:horizontal {
+    background-color: #EBFFFA;
+	border: 0px solid #424242;
+	height: 8px;
+	border-radius: 4px;
+}
+
+QSlider::handle:horizontal {
+	background-color: #EBFFFA;
+	border: 4px solid #8A9693;
+	width: 8px;
+	margin-top: -4px;
+	margin-bottom: -4px;
+	border-radius: 8px;
+}
+
+
+QSlider::groove:vertical {
+	background-color: #C6C5C6;
+	border: 0px solid #424242;
+	width: 2px;
+	height: 100px;
+	border-radius: 1px;
+}
+
+QSlider::sub-page:vertical {
+    background-color: #3E3E3E;
+	border: 0px solid #424242;
+	width: 2px;
+	height: 100px;
+	margin-top: -1px;
+	border-radius: 1px;
+}
+
+QSlider::handle:vertical {
+	background-color: white;
+	width: 4px;
+	height: 5px;
+	margin-left: -5px;
+	margin-right: -5px;
+	border-radius: 2px;
+}
+
+/* Time Frame */
+
+QFrame#time-frame {
+    background: #2E3231;
+    border-radius: 16px;
+    min-width: 86px;
+}
+
+QFrame#time-frame QLabel{
+    color: white;
+    font-size: 11px;
+}
+
+
+/* Track Item */
+
+
+QFrame#track-item {
+    background: #2E3231;
+    border-radius: 8px;
+}
+
+QFrame#track-item QLabel#track-item-title {
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+QFrame#track-item QLabel#track-item-artist {
+    color: #9FA5A3;
+    font-size: 11px;
+}
+
+
+/* Page Class */
+
+
+QWidget#page {
+    background: transparent;
+}
+
+QLabel#page-title {
+    color: white;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+QFrame#line-separator {
+    border: none;
+    background: #171918;
+}
+
+
+/* Item Container */
+
+
+QScrollArea#item-container {
+    background: transparent;
+    border: none;
+}
+
+QWidget#widget-container {
+    background: transparent;
+}
+
+
+/* Library */
+
+
+QLabel#empty-message {
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+QLabel#tip-message {
+    color: #9FA5A3;
+    font-size: 12px;
+}
+
+QPushButton#library-add {
+    background: #EBFFFA;
+    border: none;
+    border-radius: 14px;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+}
+
+
+/* Create Playlist Dialog */
+
+
+QPushButton#add-cover {
+    background: #2E3231;
+    color: white;
+    font-size: 14px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 4px;
+}
+
+
+/* Playlist Item */
+
+
+QFrame#playlist-item {
+    padding: -5px;
+    background: #2E3231;
+    border: 1px solid #4F5654;
+    border-radius: 8px;
+}
+
+QLabel#playlist-title {
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+QLabel#playlist-properties-label {
+    color: #9FA5A3;
+    font-size: 11px;
+}
