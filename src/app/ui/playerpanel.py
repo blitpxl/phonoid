@@ -99,6 +99,21 @@ class SeekbarFrame(QtWidgets.QFrame):
         shadowify(self)
 
 
+class FavouriteFrame(QtWidgets.QFrame):
+    def __init__(self, p):
+        super(FavouriteFrame, self).__init__(p)
+        self.setObjectName("favourite-frame")
+        self.setFixedSize(34, 34)
+        self.hlay = QtWidgets.QHBoxLayout(self)
+        self.hlay.setContentsMargins(0, 0, 0, 0)
+        self.favouriteButton = QtWidgets.QPushButton(QIcon("res/icons/fav-untoggled.svg"), "", self)
+        self.favouriteButton.setIconSize(QSize(16, 16))
+        self.favouriteButton.setFixedSize(30, 30)
+        self.hlay.addWidget(self.favouriteButton)
+
+        shadowify(self)
+
+
 class TimeFrame(QtWidgets.QFrame):
     def __init__(self, p):
         super(TimeFrame, self).__init__(p)
@@ -122,11 +137,14 @@ class PlayerPanelLayout(QtWidgets.QHBoxLayout):
         self.playerControllerFrame = PlayerControllerFrame(self.parent())
         self.playbackControllerFrame = PlaybackControllerFrame(self.parent())
         self.seekbarFrame = SeekbarFrame(self.parent())
+        self.favouriteFrame = FavouriteFrame(self.parent())
         self.timeFrame = TimeFrame(self.parent())
 
         self.bottom_hlay.addWidget(self.playerControllerFrame)
         self.bottom_hlay.addWidget(self.playbackControllerFrame)
-        self.bottom_hlay.addWidget(self.timeFrame, alignment=Qt.AlignRight)
+        self.bottom_hlay.addStretch()
+        self.bottom_hlay.addWidget(self.favouriteFrame)
+        self.bottom_hlay.addWidget(self.timeFrame)
         self.vlay.addWidget(self.seekbarFrame)
         self.vlay.addLayout(self.bottom_hlay)
         self.addWidget(self.playerInfoFrame)

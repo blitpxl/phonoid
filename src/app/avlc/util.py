@@ -2,6 +2,7 @@ import os
 import random
 import ctypes
 import vlc
+from inspect import getfullargspec
 
 
 class RandomMediaIndexGenerator(object):
@@ -20,8 +21,8 @@ class RandomMediaIndexGenerator(object):
             return randomIndex
 
 
-def get_local_file(file):
-    return os.path.join(os.path.split(__file__)[0], file)
+def hasparam(func):
+    return bool(getfullargspec(func).args)
 
 
 def set_lib(dll, plugin_path=None):

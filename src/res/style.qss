@@ -32,6 +32,37 @@ QLabel {
     font-size: 13px;
 }
 
+QComboBox {
+    background: #2E3231;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    font-size: 15px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    padding-left: 16px;
+    padding-right: 16px;
+    min-width: 114px;
+}
+
+QComboBox::drop-down {
+    border: 0;
+}
+
+QComboBox::down-arrow {
+    image: url("res/icons/dropdown-down.svg");
+    width: 16px;
+    height: 16px;
+    padding-right: 32px;
+}
+
+QComboBox QListView {
+    background: #2E3231;
+    color: white;
+    border: 1px solid #4F5654;
+    padding: 8px;
+}
+
 
 /* Top level window */
 
@@ -106,6 +137,49 @@ QPushButton#cancel-button {
 }
 
 
+/* Vertical ScrollBar */
+
+
+QScrollBar:vertical {
+    background: transparent;
+    border: none;
+    width: 18px;
+    padding-top: 25px;
+    padding-bottom: 25px;
+    padding-left: -2px;
+    padding-right: -2px;
+}
+
+QScrollBar::handle:vertical {
+    background-color: #5C6462;
+    min-height: 50px;
+    margin: 0 5px;
+    border-radius: 6px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #6A7371;
+}
+
+QScrollBar::add-line:vertical {
+    height: 20px;
+    image: url("res/icons/add-page-v.svg");
+}
+
+QScrollBar::sub-line:vertical {
+    height: 20px;
+    image: url("res/icons/sub-page-v.svg");
+}
+
+QScrollBar::add-page:vertical {
+    background: transparent;
+}
+
+QScrollBar::sub-page:vertical {
+    background: transparent;
+}
+
+
 /* Side Tab */
 
 
@@ -116,6 +190,11 @@ QFrame#side-tab {
 
 QFrame#side-tab QPushButton{
     background: transparent;
+    border-radius: 25px;
+}
+
+QFrame#side-tab QPushButton:checked{
+    background: #4F5654;
 }
 
 QFrame#side-tab QFrame {
@@ -211,30 +290,47 @@ QSlider::handle:horizontal {
 
 
 QSlider::groove:vertical {
-	background-color: #C6C5C6;
-	border: 0px solid #424242;
-	width: 2px;
-	height: 100px;
-	border-radius: 1px;
+	background-color: #EBFFFA;
+	width: 8px;
+	border-radius: 4px;
+	border: none;
 }
 
 QSlider::sub-page:vertical {
-    background-color: #3E3E3E;
-	border: 0px solid #424242;
-	width: 2px;
-	height: 100px;
-	margin-top: -1px;
-	border-radius: 1px;
+    background-color: #121413;
+    width: 8px;
+	border-radius: 3px;
 }
 
 QSlider::handle:vertical {
-	background-color: white;
-	width: 4px;
-	height: 5px;
-	margin-left: -5px;
-	margin-right: -5px;
-	border-radius: 2px;
+	background-color: #EBFFFA;
+	border: 4px solid #8A9693;
+	width: 8px;
+	height: 8px;
+	margin-left: -4px;
+	margin-right: -4px;
+	border-radius: 8px;
 }
+
+
+/* Favourite Frame */
+
+
+QFrame#favourite-frame {
+    background: #2E3231;
+    border-radius: 17px;
+}
+
+QFrame#favourite-frame QPushButton{
+    background: transparent;
+}
+
+QFrame#favourite-frame QPushButton:hover{
+    border: none;
+    background: #3B403F;
+    border-radius: 15;
+}
+
 
 /* Time Frame */
 
@@ -256,6 +352,8 @@ QFrame#time-frame QLabel{
 QFrame#track-item {
     background: #2E3231;
     border-radius: 8px;
+    border: 1px solid #4F5654;
+    padding: -5px;
 }
 
 QFrame#track-item QLabel#track-item-title {
@@ -358,4 +456,75 @@ QLabel#playlist-title {
 QLabel#playlist-properties-label {
     color: #9FA5A3;
     font-size: 11px;
+}
+
+
+/* Equalizer Dialog */
+
+
+QLabel#eq-label {
+    color: #9FA5A3;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+DropDown#preset-selector {
+    background: #2E3231;
+    border-radius: 8px;
+    min-height: 32px;
+}
+
+DropDown#preset-selector::menu-indicator {
+    image: none;
+}
+
+DropDown#preset-selector QLabel {
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+
+DropDownMenu {
+    border: 0;
+    padding: 3 3 3 3;
+    background: rgb(30, 30, 30);
+    color: white;
+    border: 1px solid rgb(55, 55, 55);
+    border-radius: 8px;
+    menu-scrollable: 1;
+}
+
+DropDownMenu::item {
+    padding: 5 25 5 5;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+DropDownMenu::item:selected {
+    padding: 5 5 5 5;
+    background: #2E7CEE;
+    border-radius: 8px;
+}
+
+QPushButton#eq-save {
+    background: #EBFFFA;
+    qproperty-icon: url("res/icons/save.svg");
+    qproperty-iconSize: 20px;
+    color: black;
+    font-weight: bold;
+    font-size: 15px;
+    border-radius: 8px;
+    min-width: 88px;
+    min-height: 32px;
+}
+
+QPushButton#eq-close {
+    background: #2E3231;
+    color: white;
+    font-weight: bold;
+    font-size: 15px;
+    border-radius: 8px;
+    min-width: 88px;
+    min-height: 32px;
 }

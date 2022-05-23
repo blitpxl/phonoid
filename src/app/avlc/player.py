@@ -28,14 +28,21 @@ class AudioPlayer(object):
         self.volumeLimit = 100
         self.mediaIndexGenerator = RandomMediaIndexGenerator()
 
-        self._connect_internal_events()  # connect internal events
-        self.connect_event(AudioPlayerEvent.InstanceReloaded, self._connect_internal_events)
+        self._connect_native_events()  # connect native events
+        self.connect_event(AudioPlayerEvent.InstanceReloaded, self._connect_native_events)
 
     def __del__(self):
         self.cleanup()
 
-    def _connect_internal_events(self):
+    def _connect_native_events(self):
         self.connect_event(AudioPlayerEvent.NI_TrackEndReached, self._on_track_end_reached)
+        self.connect_event(AudioPlayerEvent.N_Opening, AudioPlayerEvent.Opening)
+        self.connect_event(AudioPlayerEvent.N_Buffering, AudioPlayerEvent.Buffering)
+        self.connect_event(AudioPlayerEvent.N_Playing, AudioPlayerEvent.Playing)
+        self.connect_event(AudioPlayerEvent.N_Paused, AudioPlayerEvent.Paused)
+        self.connect_event(AudioPlayerEvent.N_Stopped, AudioPlayerEvent.Stopped)
+        self.connect_event(AudioPlayerEvent.N_Error, AudioPlayerEvent.Error)
+        self.connect_event(AudioPlayerEvent.N_PositionChanged, AudioPlayerEvent.PositionChanged)
 
     def _on_track_end_reached(self):  # called everytime a playlist finished playing
         self.next()
@@ -197,16 +204,13 @@ class AudioPlayer(object):
     def get_media_count(self):
         return len(self.mediaList)
 
-    def connect_event(self, event, function, call_on_new_thread=True):
-        if hasattr(event, "callbacks"):
+    def connect_event(self, event, function):
+        if hasattr(event, "functionQueue"):
             event.connect_callback(function)
         else:  # if the event is from vlc then call it from other thread because libvlc methods is non-reentrant
             def callback_thread(_):
                 threading.Thread(target=function).start()
-            if call_on_new_thread:
-                self.vlcPlayer.event_manager().event_attach(event, callback_thread)
-            else:
-                self.vlcPlayer.event_manager().event_attach(event, function)
+            self.vlcPlayer.event_manager().event_attach(event, callback_thread)
         return self
 
     def wait(self):

@@ -18,7 +18,7 @@ on this project on multiple computers.
 - System that allow the user to 'favourite' a song
 - Recently played/History
 - Settings UI
-- Equalizer UI
+- ~~Equalizer UI~~ ✓
 - YouTube Playback
 - YouTube integration that allow the user to add YouTube tracks as if it's an actual music file
 - Search functionality for each tab

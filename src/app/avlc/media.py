@@ -1,13 +1,16 @@
 from .event import MediaEvent
+from urllib.parse import unquote, urlparse
 import threading
 import datetime
 import vlc
 import os
 
 
-class AvlcMedia(object):
+class AvlcMedia:
 
     pafy_obj = None
+    # make the pafy module a singleton and dont import if not needed
+    # pafy takes a lot of memory to impor,t so it will be imported automatically when needed
 
     def __init__(self, location, mediaType, vlcInstance):
         self.location = location
@@ -32,7 +35,7 @@ class AvlcMedia(object):
             self.vlcMediaObject = vlcInstance.media_new(a.url)
 
     def connect_event(self, event, function):
-        if hasattr(event, "callbacks"):
+        if hasattr(event, "functionQueue"):
             event.connect_callback(function)
         else:
             def callback_thread(_):
@@ -55,29 +58,19 @@ class AvlcMedia(object):
             self.artist = self.vlcMediaObject.get_meta(1)
             self.album = self.vlcMediaObject.get_meta(4)
             self.genre = self.vlcMediaObject.get_meta(2)
-            self.art = self.vlcMediaObject.get_meta(15)
             self.duration = self.vlcMediaObject.get_duration()
+            self.art: str = self.vlcMediaObject.get_meta(15)
+            if self.art is not None:
+                if self.art.startswith("file"):
+                    self.art = unquote(urlparse(self.art).path)[1:]
+                else:
+                    self.art = None
         else:
             self.title = self.p.title
             self.channel = self.p.author
             self.category = self.p.category
             self.duration = self.vlcMediaObject.get_duration()
-        MediaEvent.Parsed(
-            {
-                "location": self.location,
-                "filename": self.filename,
-                "type": self.mediaType,
-                "date": self.dateAdded,
-                "title": self.title,
-                "artist": self.artist,
-                "album": self.album,
-                "art": self.art,
-                "genre": self.genre,
-                "duration": self.duration,
-                "channel": self.channel,
-                "category": self.category
-            }
-        )
+        MediaEvent.Parsed(self)
 
     @classmethod
     def _get_pafy(cls):

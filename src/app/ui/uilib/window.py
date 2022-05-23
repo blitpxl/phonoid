@@ -20,6 +20,7 @@ class WindowTitleNotch(QtWidgets.QFrame):
         self.hbox = QtWidgets.QHBoxLayout(self)
         self.hbox.setContentsMargins(0, 0, 0, 0)
         self.title = QtWidgets.QLabel(title, self)
+        self.title.setObjectName("window-title")
         self.title.adjustSize()
         self.setFixedSize(self.title.width() + 25, 20)
         self.hbox.addWidget(self.title, alignment=Qt.AlignCenter)
@@ -27,7 +28,7 @@ class WindowTitleNotch(QtWidgets.QFrame):
     def setTitle(self, title):
         self.title.setText(title)
         self.title.adjustSize()
-        self.setFixedSize(self.title.width()+50, 20)
+        self.setFixedSize(self.title.width()+35, 20)
         self.parent().centerTitleNotch()
 
 
@@ -88,9 +89,9 @@ class Window(QPushButton):  # i know it doesn't make sense to subclass a button,
         self.setObjectName("main-window")
         self.resize(width, height)
         self.setWindowFlags(Qt.FramelessWindowHint)
-        self.setAttribute(Qt.WA_TranslucentBackground)
         self.titlebar = TitleBar(self)
         self.opacity = 255
+        self.isResizing = False
         self.closingQueue = []
 
     def raiseBaseWidget(self):
@@ -106,6 +107,9 @@ class Window(QPushButton):  # i know it doesn't make sense to subclass a button,
 
     def setOpacity(self, opacity: int):
         self.opacity = opacity
+
+    def setResizingState(self, isResizing):
+        self.isResizing = isResizing
 
     # def paintEvent(self, event) -> None:
     #     window_border_radius = 16
@@ -138,6 +142,8 @@ class CornerGrip(QtWidgets.QSizeGrip):
 
 
 class SideGrip(QtWidgets.QFrame):
+    isResizing = pyqtSignal(bool)
+
     def __init__(self, p, edge, cursor):
         super(SideGrip, self).__init__(p)
         self.edge = edge
@@ -146,6 +152,12 @@ class SideGrip(QtWidgets.QFrame):
 
     def mousePressEvent(self, a0) -> None:
         self.window().windowHandle().startSystemResize(self.edge)
+        self.isResizing.emit(True)
+        QtWidgets.QFrame.mousePressEvent(self, a0)
+
+    def mouseReleaseEvent(self, mouseEvent) -> None:
+        self.isResizing.emit(False)
+        QtWidgets.QFrame.mouseReleaseEvent(self, mouseEvent)
 
 
 class WindowContainer(QWidget):
@@ -176,6 +188,12 @@ class WindowContainer(QWidget):
         self.topRightGrip = CornerGrip(self)
         self.bottomLeftGrip = CornerGrip(self)
         self.topLeftGrip = CornerGrip(self)
+
+        for sideGrip in self.findChildren(SideGrip):
+            sideGrip.isResizing.connect(lambda resizing: self.windowObject.setResizingState(resizing))
+
+        for cornerGrip in self.findChildren(CornerGrip):
+            cornerGrip.isResizing.connect(lambda resizing: self.windowObject.setResizingState(resizing))
 
         self.showAnimation = QPropertyAnimation(self, b"pos")
         self.showAnimation.setDuration(500)
@@ -256,14 +274,14 @@ class WindowContainer(QWidget):
         self.bottomLeftGrip.move(15, self.windowObject.height() + 10)
         self.topLeftGrip.move(10, 10)
 
-        self.leftSizeGrip.move(10, 20)
-        self.leftSizeGrip.resize(10, self.windowObject.height())
-        self.topSizeGrip.move(20, 10)
-        self.topSizeGrip.resize(self.windowObject.width(), 10)
+        self.leftSizeGrip.move(0, 20)
+        self.leftSizeGrip.resize(20, self.windowObject.height())
+        self.topSizeGrip.move(20, 0)
+        self.topSizeGrip.resize(self.windowObject.width(), 20)
         self.rightSizeGrip.move(self.width() - 20, 20)
-        self.rightSizeGrip.resize(10, self.windowObject.height())
+        self.rightSizeGrip.resize(20, self.windowObject.height())
         self.bottomSizeGrip.move(20, self.height() - 20)
-        self.bottomSizeGrip.resize(self.windowObject.width(), 10)
+        self.bottomSizeGrip.resize(self.windowObject.width(), 20)
         QWidget.resizeEvent(self, a0)
 
 
@@ -308,6 +326,18 @@ class DialogContainer(WindowContainer):
         super(DialogContainer, self).__init__(dialog, parent, width, height)
         self.setWindowFlags(Qt.Dialog | Qt.FramelessWindowHint)
         self.windowObject.titlebar.windowNotch.setTitle(title)
+
+    def setResizable(self, resizable):
+        if resizable:
+            for sideGrip in self.findChildren(SideGrip):
+                sideGrip.show()
+            for conerGrip in self.findChildren(CornerGrip):
+                conerGrip.show()
+        else:
+            for sideGrip in self.findChildren(SideGrip):
+                sideGrip.hide()
+            for conerGrip in self.findChildren(CornerGrip):
+                conerGrip.hide()
 
     def show(self) -> None:
         # move the dialog to the center of the parent window

@@ -1,9 +1,7 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QSize, Qt
-from .uilib.util import mask_image_circ, shadowify
+from PyQt5.QtCore import QSize, Qt, QVariantAnimation, QEasingCurve
 from .uilib.flowlayout import FlowLayout
-from .uilib.window import Dialog, DialogContainer
 from typing import Union
 
 
@@ -17,7 +15,7 @@ class ItemContainer(QtWidgets.QScrollArea):
         self.widgetContainer = QtWidgets.QWidget()
         self.widgetContainer.setObjectName("widget-container")
         self.verticalScrollBar().setObjectName("vertical-scrollbar")
-        self.widgetLayout = FlowLayout(self.widgetContainer)    # apply the flow layout to the widget container
+        self.widgetLayout = FlowLayout(self.widgetContainer)  # apply the flow layout to the widget container
         self.setWidget(self.widgetContainer)
         self.widgetLayout.setSpacing(32)
 
@@ -39,6 +37,22 @@ class Page(QtWidgets.QWidget):
         self.vlay.addWidget(self.pageTitle, alignment=Qt.AlignLeft | Qt.AlignTop, stretch=-1)
         self.vlay.addWidget(self.line, alignment=Qt.AlignLeft | Qt.AlignTop, stretch=-1)
         self.vlay.addSpacing(25)
+        self.opacity = QtWidgets.QGraphicsOpacityEffect(self)
+        self.opacity.setEnabled(False)
+        self.setGraphicsEffect(self.opacity)
+
+        self.inTransition = QVariantAnimation(self)
+        self.inTransition.setEasingCurve(QEasingCurve.OutCubic)
+        self.inTransition.setDuration(250)
+        self.inTransition.setStartValue(0.0)
+        self.inTransition.setEndValue(1.0)
+        self.inTransition.valueChanged.connect(self.opacity.setOpacity)
+        self.inTransition.finished.connect(lambda: self.opacity.setEnabled(False))
+        self.inTransition.start()
+
+    def showEvent(self, a0) -> None:
+        self.opacity.setEnabled(True)
+        self.inTransition.start()
 
 
 class EmptyLibrary(QtWidgets.QWidget):
@@ -92,42 +106,6 @@ class EmptyPlaylist(QtWidgets.QWidget):
         self.vlay.addWidget(self.addButton, alignment=Qt.AlignCenter)
 
 
-class CreatePlaylistDialog(Dialog):
-    def __init__(self, p):
-        super(CreatePlaylistDialog, self).__init__(p)
-        self.hlay = QtWidgets.QHBoxLayout()
-        self.input_lay = QtWidgets.QVBoxLayout()
-        self.cover_button_lay = QtWidgets.QVBoxLayout()
-
-        self.addCoverButton = QtWidgets.QPushButton(self)
-        self.addCoverButton.setIcon(QIcon("res/icons/create_playlist_add_cover.svg"))
-        self.addCoverButton.setFixedSize(128, 128)
-        self.addCoverButton.setIconSize(QSize(32, 32))
-        self.addCoverButton.setObjectName("add-cover")
-
-        self.addCoverLabel = QtWidgets.QLabel("Add a cover image\n(optional)")
-        self.addCoverLabel.setAlignment(Qt.AlignCenter)
-
-        self.playlistName = QtWidgets.QLineEdit(self)
-        self.playlistName.setPlaceholderText("Give this playlist a name")
-        self.playlistDesc = QtWidgets.QTextEdit(self)
-        self.playlistDesc.setPlaceholderText("Give this playlist a description (optional)")
-        shadowify(self.addCoverButton)
-        shadowify(self.playlistName)
-        shadowify(self.playlistDesc)
-
-        self.input_lay.addWidget(self.playlistName)
-        self.input_lay.addSpacing(10)
-        self.input_lay.addWidget(self.playlistDesc)
-        self.cover_button_lay.addWidget(self.addCoverButton, alignment=Qt.AlignHCenter)
-        self.hlay.addLayout(self.cover_button_lay)
-        self.hlay.addSpacing(25)
-        self.hlay.addLayout(self.input_lay)
-        self.mainLayout.addLayout(self.hlay)
-        self.dialogButtonLayout.addWidget(self.addCoverLabel, alignment=Qt.AlignLeft)
-        self.showDialogButtons()
-
-
 class PlaylistPage(Page):
     def __init__(self, p, pageTitle):
         super(PlaylistPage, self).__init__(p, pageTitle)
@@ -142,16 +120,65 @@ class PlaylistPage(Page):
         self.vlay.addWidget(self.playlistContainer)
 
 
-class Favourite(Page):
+class EmptyFavourite(QtWidgets.QWidget):
+    def __init__(self, p):
+        super(EmptyFavourite, self).__init__(p)
+        self.vlay = QtWidgets.QVBoxLayout(self)
+        self.vlay.setAlignment(Qt.AlignCenter)
+        self.vlay.setSpacing(25)
+        self.vlay.setContentsMargins(0, 0, 30, 0)
+        self.message = QtWidgets.QLabel("You haven't favourited any song yet.")
+        self.message.setObjectName("empty-message")
+        self.tipMessage = QtWidgets.QLabel("press the heart button when a song is playing to add it as favourite")
+        self.tipMessage.setObjectName("tip-message")
+        self.vlay.addWidget(self.message, alignment=Qt.AlignCenter)
+        self.vlay.addWidget(self.tipMessage, alignment=Qt.AlignCenter)
+
+
+class FavouritePage(Page):
     def __init__(self, p, pageTitle):
-        super(Favourite, self).__init__(p, pageTitle)
+        super(FavouritePage, self).__init__(p, pageTitle)
+        self.emptyFavouritePrompt = EmptyFavourite(self)
+        self.trackContainer = None
+        self.vlay.addWidget(self.emptyFavouritePrompt, stretch=1)
+
+    def closeEmptyPrompt(self):
+        self.vlay.removeWidget(self.emptyFavouritePrompt)
+        del self.emptyFavouritePrompt
+        self.trackContainer = ItemContainer(self)
+        self.vlay.addWidget(self.trackContainer)
 
 
-class History(Page):
+class EmptyHistory(QtWidgets.QWidget):
+    def __init__(self, p):
+        super(EmptyHistory, self).__init__(p)
+        self.vlay = QtWidgets.QVBoxLayout(self)
+        self.vlay.setAlignment(Qt.AlignCenter)
+        self.vlay.setSpacing(25)
+        self.vlay.setContentsMargins(0, 0, 30, 0)
+        self.message = QtWidgets.QLabel("You have no playing history yet.")
+        self.message.setObjectName("empty-message")
+        self.tipMessage = QtWidgets.QLabel("start playing some track and it will show up here")
+        self.tipMessage.setObjectName("tip-message")
+        self.vlay.addWidget(self.message, alignment=Qt.AlignCenter)
+        self.vlay.addWidget(self.tipMessage, alignment=Qt.AlignCenter)
+
+
+class HistoryPage(Page):
     def __init__(self, p, pageTitle):
-        super(History, self).__init__(p, pageTitle)
+        super(HistoryPage, self).__init__(p, pageTitle)
+        self.emptyFavouritePrompt = EmptyHistory(self)
+        self.trackContainer = None
+        self.vlay.addWidget(self.emptyFavouritePrompt, stretch=1)
+
+    def closeEmptyPrompt(self):
+        self.vlay.removeWidget(self.emptyFavouritePrompt)
+        del self.emptyFavouritePrompt
+        self.trackContainer = ItemContainer(self)
+        self.vlay.addWidget(self.trackContainer)
 
 
-class Settings(Page):
+class SettingsPage(Page):
     def __init__(self, p, pageTitle):
-        super(Settings, self).__init__(p, pageTitle)
+        super(SettingsPage, self).__init__(p, pageTitle)
+        raise NotImplementedError
