@@ -1,4 +1,4 @@
-![Phonoid's User Interface](https://i.ibb.co/MnrwPYC/Phonoid.png)
+![Phonoid's User Interface](https://i.ibb.co/HdSC9VV/Phonoid.png)
 
 # About
 Phonoid is a desktop music player written in Python + Qt5 solely
