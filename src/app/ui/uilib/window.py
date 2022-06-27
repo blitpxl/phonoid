@@ -77,10 +77,15 @@ class TitleBar(QtWidgets.QFrame):
 
     def mousePressEvent(self, event) -> None:
         self.window().windowHandle().startSystemMove()
+        self.parent().setUpdateState(True)
         QtWidgets.QFrame.mousePressEvent(self, event)
 
+    def mouseReleaseEvent(self, a0) -> None:
+        self.parent().setUpdateState(False)
+        QtWidgets.QFrame.mouseReleaseEvent(self, a0)
 
-class Window(QPushButton):  # i know it doesn't make sense to subclass a button, but everything didn't work except this
+
+class Window(QPushButton):  # I know it doesn't make sense to subclass a button, but everything didn't work except this
     onMove = pyqtSignal(QPoint)
 
     def __init__(self, p, width: int = 640, height: int = 480):
@@ -91,7 +96,7 @@ class Window(QPushButton):  # i know it doesn't make sense to subclass a button,
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.titlebar = TitleBar(self)
         self.opacity = 255
-        self.isResizing = False
+        self.isUpdating = False
         self.closingQueue = []
 
     def raiseBaseWidget(self):
@@ -108,8 +113,8 @@ class Window(QPushButton):  # i know it doesn't make sense to subclass a button,
     def setOpacity(self, opacity: int):
         self.opacity = opacity
 
-    def setResizingState(self, isResizing):
-        self.isResizing = isResizing
+    def setUpdateState(self, isUpdating):
+        self.isUpdating = isUpdating
 
     # def paintEvent(self, event) -> None:
     #     window_border_radius = 16
@@ -173,7 +178,7 @@ class WindowContainer(QWidget):
         self.dropShadow.setOffset(0, 0)
         self.windowObject.setGraphicsEffect(self.dropShadow)
 
-        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.Window)
         self.setAttribute(Qt.WA_TranslucentBackground)
 
         with open("res/style.qss") as style:
@@ -190,10 +195,10 @@ class WindowContainer(QWidget):
         self.topLeftGrip = CornerGrip(self)
 
         for sideGrip in self.findChildren(SideGrip):
-            sideGrip.isResizing.connect(lambda resizing: self.windowObject.setResizingState(resizing))
+            sideGrip.isResizing.connect(lambda resizing: self.windowObject.setUpdateState(resizing))
 
         for cornerGrip in self.findChildren(CornerGrip):
-            cornerGrip.isResizing.connect(lambda resizing: self.windowObject.setResizingState(resizing))
+            cornerGrip.isResizing.connect(lambda resizing: self.windowObject.setUpdateState(resizing))
 
         self.showAnimation = QPropertyAnimation(self, b"pos")
         self.showAnimation.setDuration(500)

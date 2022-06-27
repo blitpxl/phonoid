@@ -1,14 +1,15 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSize, Qt
-from .uilib.util import mask_image_circ, shadowify
+from .widgets import PlayerPanelButton, ScrollableButton, Seekbar
+from .uilib.util import mask_image_circ, shadowify, setElide
 
 
 class PlayerInfoFrame(QtWidgets.QFrame):
     def __init__(self, p):
         super(PlayerInfoFrame, self).__init__(p)
         self.hlay = QtWidgets.QHBoxLayout(self)
-        self.hlay.setContentsMargins(4, 0, 0, 0)
+        self.hlay.setContentsMargins(4, 0, 16, 0)
         self.vlay = QtWidgets.QVBoxLayout()
         self.setFixedSize(208, 64)
         self.setObjectName("player-info-frame")
@@ -33,6 +34,18 @@ class PlayerInfoFrame(QtWidgets.QFrame):
 
         shadowify(self)
 
+    def setCoverArt(self, coverPath):
+        if coverPath is None:
+            self.coverArt.setPixmap(mask_image_circ("res/icons/cd.png", imgtype="png", size=58))
+        else:
+            self.coverArt.setPixmap(mask_image_circ(coverPath, imgtype="jpg", size=58))
+
+    def setTitle(self, trackTitle):
+        setElide(self.trackTitle, trackTitle)
+
+    def setArtist(self, trackArtist):
+        setElide(self.trackArtist, trackArtist)
+
 
 class PlayerControllerFrame(QtWidgets.QFrame):
     def __init__(self, p):
@@ -44,17 +57,19 @@ class PlayerControllerFrame(QtWidgets.QFrame):
         self.setFixedSize(168, 34)
         self.setObjectName("player-controller-frame")
 
-        self.skipBack = QtWidgets.QPushButton(QIcon("res/icons/skipback.svg"), "", self)
-        self.rewind = QtWidgets.QPushButton(QIcon("res/icons/rewind.svg"), "", self)
-        self.playPause = QtWidgets.QPushButton(QIcon("res/icons/play.svg"), "", self)
-        self.fastForward = QtWidgets.QPushButton(QIcon("res/icons/forward.svg"), "", self)
-        self.skipForward = QtWidgets.QPushButton(QIcon("res/icons/skipforward.svg"), "", self)
+        self.previousButton = PlayerPanelButton(16, QIcon("res/icons/skipback.svg"), "", self)
+        self.rewind = PlayerPanelButton(16, QIcon("res/icons/rewind.svg"), "", self)
+        self.playPause = PlayerPanelButton(24, QIcon("res/icons/play.svg"), "", self)
+        self.fastForward = PlayerPanelButton(16, QIcon("res/icons/forward.svg"), "", self)
+        self.nextButton = PlayerPanelButton(16, QIcon("res/icons/skipforward.svg"), "", self)
 
-        self.skipBack.setIconSize(QSize(16, 16))
-        self.rewind.setIconSize(QSize(16, 16))
-        self.playPause.setIconSize(QSize(24, 24))
-        self.fastForward.setIconSize(QSize(16, 16))
-        self.skipForward.setIconSize(QSize(16, 16))
+        self.rewind.setAutoRepeat(True)
+        self.rewind.setAutoRepeatDelay(500)
+        self.rewind.setAutoRepeatInterval(100)
+
+        self.fastForward.setAutoRepeat(True)
+        self.fastForward.setAutoRepeatDelay(500)
+        self.fastForward.setAutoRepeatInterval(100)
 
         for button in self.findChildren(QtWidgets.QPushButton):
             button.setFixedSize(30, 30)
@@ -73,7 +88,7 @@ class PlaybackControllerFrame(QtWidgets.QFrame):
         self.setFixedSize(97, 34)
         self.setObjectName("playback-controller-frame")
 
-        self.volumeButton = QtWidgets.QPushButton(QIcon("res/icons/volume.svg"), "", self)
+        self.volumeButton = ScrollableButton(16, QIcon("res/icons/volume.svg"), "", self)
         self.repeatButton = QtWidgets.QPushButton(QIcon("res/icons/repeat.svg"), "", self)
         self.equalizerButton = QtWidgets.QPushButton(QIcon("res/icons/equalizer.svg"), "", self)
 
@@ -92,7 +107,7 @@ class SeekbarFrame(QtWidgets.QFrame):
         self.setFixedHeight(25)
         self.hlay = QtWidgets.QHBoxLayout(self)
         self.hlay.setContentsMargins(8, 0, 8, 0)
-        self.seekbar = QtWidgets.QSlider(self)
+        self.seekbar = Seekbar(self)
         self.seekbar.setOrientation(Qt.Horizontal)
         self.hlay.addWidget(self.seekbar)
 

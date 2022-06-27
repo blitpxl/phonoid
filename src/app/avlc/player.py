@@ -23,9 +23,11 @@ class AudioPlayer(object):
         self.vlcPlayer = self.vlcInstance.media_player_new()
 
         self.mediaList = []
-        self.playerIndex = 0
+        self.currentIndex = 0
         self.playbackMode = PlaybackMode.normal
         self.volumeLimit = 100
+        self.isPaused = True
+        self.isPlaying = False
         self.mediaIndexGenerator = RandomMediaIndexGenerator()
 
         self._connect_native_events()  # connect native events
@@ -72,7 +74,7 @@ class AudioPlayer(object):
         self.vlcInstanceArgs += list(vlcArgs)           # add new argument/s to the argument container
         self._reload_instance(self.vlcInstanceArgs)     # reload the vlcInstance and apply the args inside the container
         if self.vlcPlayer.is_playing():
-            self.play(self.playerIndex, position)           # continue playing the song from the saved position
+            self.play(self.currentIndex, position)           # continue playing the song from the saved position
         else:
             pass
         self.set_playback_rate(playback_rate)           # reapply the playback rate to the new player
@@ -84,15 +86,15 @@ class AudioPlayer(object):
             self.vlcInstanceArgs.remove(args)
         self._reload_instance(self.vlcInstanceArgs)
         if self.vlcPlayer.is_playing():
-            self.play(self.playerIndex, position)
+            self.play(self.currentIndex, position)
         else:
             pass
         self.set_playback_rate(playback_rate)
 
     def sort_media_list(self, sortBy=SortBy.filename, sortMode=SortMode.ascending):
-        currentPlayingMedia = self.mediaList[self.playerIndex]
+        currentPlayingMedia = self.mediaList[self.currentIndex]
         self.mediaList = os_sorted(self.mediaList, key=attrgetter(sortBy), reverse=sortMode)
-        self.playerIndex = self.mediaList.index(currentPlayingMedia)
+        self.currentIndex = self.mediaList.index(currentPlayingMedia)
         AudioPlayerEvent.MediaSorted()
 
     def add_avlc_media(self, avlcmedia):
@@ -110,34 +112,41 @@ class AudioPlayer(object):
 
     def play(self, trackIndex: int = 0, position: int = 0):
         if not trackIndex >= self.get_media_count():
-            self.playerIndex = trackIndex
+            self.currentIndex = trackIndex
         else:
             msg = f"Track Index out of range ({trackIndex}), Defaulting to 0"
             warnings.warn(msg, RuntimeWarning)
-            self.playerIndex = 0
-        self.vlcPlayer.set_media(self.mediaList[self.playerIndex].vlcMediaObject)
+            self.currentIndex = 0
+        self.vlcPlayer.set_media(self.mediaList[self.currentIndex].vlcMediaObject)
         self.vlcPlayer.play()
         self.vlcPlayer.set_time(position)
+        self.isPaused = False
+        self.isPlaying = True
         return self
 
     def pause(self):
         self.vlcPlayer.pause()
+        if self.isPaused:
+            self.isPaused = False
+        else:
+            self.isPaused = True
         return self
 
     def stop(self):
         self.vlcPlayer.stop()
+        self.isPlaying = False
         return self
 
     def next(self):
         if self.playbackMode == PlaybackMode.normal or self.playbackMode == PlaybackMode.repeatPlaylist:
-            if not self.playerIndex + 1 >= self.get_media_count():
-                self.playerIndex += 1
-                self.play(self.playerIndex)
+            if not self.currentIndex + 1 >= self.get_media_count():
+                self.currentIndex += 1
+                self.play(self.currentIndex)
                 AudioPlayerEvent.NextTrack()
             else:
                 self._on_playlist_end_reached()
         elif self.playbackMode == PlaybackMode.repeatTrack:
-            self.play(self.playerIndex)
+            self.play(self.currentIndex)
             AudioPlayerEvent.NextTrack()
         elif self.playbackMode == PlaybackMode.shuffle:
             randomIndex = self.mediaIndexGenerator(self.get_media_count())
@@ -154,9 +163,9 @@ class AudioPlayer(object):
         return self
 
     def previous(self):
-        if not self.playerIndex - 1 < 0:
-            self.playerIndex -= 1
-            self.play(self.playerIndex)
+        if not self.currentIndex - 1 < 0:
+            self.currentIndex -= 1
+            self.play(self.currentIndex)
             AudioPlayerEvent.PrevTrack()
         else:
             pass

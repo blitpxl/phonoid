@@ -31,7 +31,8 @@ class AvlcMedia:
         else:
             self._import_pafy()
             self.p = self._get_pafy().new(location)
-            a = self.p.getbestaudio()
+            import pafy
+            a = self.p.getbest()
             self.vlcMediaObject = vlcInstance.media_new(a.url)
 
     def connect_event(self, event, function):

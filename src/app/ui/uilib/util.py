@@ -4,10 +4,14 @@ from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QLabel
 import os
 
 
-def elide(label: QLabel, text: str):
+def setElide(label: QLabel, text: str):
     fontMetrics = QFontMetrics(label.font())
     elidedText = fontMetrics.elidedText(text, Qt.ElideRight, label.width())
     label.setText(elidedText)
+    if "…" in elidedText:
+        label.setToolTip(text)
+    else:
+        label.setToolTip("")
 
 
 def shadowify(widget, xoffset=0, yoffset=4, radius=4, color=(0, 0, 0, 62)):

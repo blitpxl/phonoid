@@ -2,7 +2,6 @@ from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QFont
 from app.ui.uilib.window import WindowContainer
 from app.app import Application
-
 import sys
 
 

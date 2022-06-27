@@ -1,16 +1,16 @@
-class PlaybackMode(object):
+class PlaybackMode:
     normal = 0
     repeatTrack = 1
     shuffle = 2
     repeatPlaylist = 3
 
 
-class SortMode(object):
+class SortMode:
     ascending = 0
     descending = 1
 
 
-class SortBy(object):
+class SortBy:
     filename = "filename"
     title = "title"
     artist = "artist"

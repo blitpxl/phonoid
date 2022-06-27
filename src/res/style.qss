@@ -386,6 +386,19 @@ QFrame#line-separator {
     background: #171918;
 }
 
+SearchBar {
+    padding-left: 32px;
+    min-width: 150px;
+    max-height: 25px;
+    font-size: 11px;
+    font-weight: bold;
+    border-radius: 16px;
+}
+
+SearchBar QPushButton {
+    background: transparent;
+}
+
 
 /* Item Container */
 

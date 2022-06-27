@@ -1,7 +1,18 @@
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QPixmap
-from .uilib.util import elide, mask_image_rndcb, shadowify
+from PyQt5.QtCore import Qt, pyqtSignal, QSize
+from PyQt5.QtGui import QPixmap, QIcon
+from .uilib.util import setElide, mask_image_rndcb, shadowify
+
+
+class SearchBar(QtWidgets.QLineEdit):
+    def __init__(self, p):
+        super(SearchBar, self).__init__(p)
+        self.hlay = QtWidgets.QHBoxLayout(self)
+        self.hlay.setContentsMargins(4, 0, 0, 0)
+        self.searchButton = QtWidgets.QPushButton(self)
+        self.searchButton.setIcon(QIcon("res/icons/search.svg"))
+        self.searchButton.setCursor(Qt.PointingHandCursor)
+        self.hlay.addWidget(self.searchButton, alignment=Qt.AlignLeft)
 
 
 class TrackItem(QtWidgets.QFrame):
@@ -20,6 +31,11 @@ class TrackItem(QtWidgets.QFrame):
         title = media.title
         artist = media.artist
         cover = media.art
+
+        self.searchid = title
+        if artist:
+            self.searchid += artist
+        self.searchid = self.searchid.lower()
 
         if cover is None:
             cover = "res/icons/cd.png"
@@ -51,12 +67,12 @@ class TrackItem(QtWidgets.QFrame):
         self.cover.setPixmap(mask_image_rndcb(imgpath, size=128, radius=8))
 
     def setTitle(self, title):
-        elide(self.title, title)
+        setElide(self.title, title)
         if "…" in self.title.text():
             self.title.setToolTip(title)
 
     def setArtist(self, artist):
-        elide(self.artist, artist)
+        setElide(self.artist, artist)
         if "…" in self.artist.text():
             self.artist.setToolTip(artist)
 
@@ -104,19 +120,72 @@ class PlaylistItem(QtWidgets.QFrame):
         self.cover.setPixmap(mask_image_rndcb(imgpath, size=128, radius=8))
 
     def setTitle(self, title):
-        elide(self.title, title)
-        if "…" in self.title.text():
-            self.title.setToolTip(title)
+        setElide(self.title, title)
 
     def setCount(self, count):
-        elide(self.count, f"{count} tracks")
-        if "…" in self.count.text():
-            self.count.setToolTip(count)
+        setElide(self.count, f"{count} tracks")
 
     def setDuration(self, duration):
-        elide(self.duration, f"{duration} long")
-        if "…" in self.duration.text():
-            self.count.setToolTip(duration)
+        setElide(self.duration, f"{duration} long")
+
+
+class PlayerPanelButton(QtWidgets.QPushButton):
+    def __init__(self, iconSize=16, *args, **kwargs):
+        super(PlayerPanelButton, self).__init__(*args, **kwargs)
+        self.iconSize = iconSize
+        self.setIconSize(QSize(iconSize, iconSize))
+
+    def changeIcon(self, newIconPath):
+        self.setIcon(QIcon(newIconPath))
+        self.setIconSize(QSize(self.iconSize, self.iconSize))
+
+
+class Seekbar(QtWidgets.QSlider):
+    seek = pyqtSignal(int)
+
+    def __init__(self, *args, **kwargs):
+        super(Seekbar, self).__init__(*args, **kwargs)
+        self.seeking = False
+        self.valueChanged.connect(self.on_seek)
+
+    def on_seek(self, value):
+        if self.seeking:
+            self.seek.emit(value)
+
+    def updatePosition(self, position):
+        if not self.seeking:
+            self.setValue(position)
+
+    def mousePressEvent(self, ev) -> None:
+        self.seeking = True
+        QtWidgets.QSlider.mousePressEvent(self, ev)
+
+    def mouseReleaseEvent(self, ev) -> None:
+        self.seeking = False
+        QtWidgets.QSlider.mouseReleaseEvent(self, ev)
+
+
+class ScrollableButton(PlayerPanelButton):
+    onValueChanged = pyqtSignal(int)
+
+    def __init__(self, *args, **kwargs):
+        super(ScrollableButton, self).__init__(*args, **kwargs)
+        self.currentVolume = 50
+        self.minr, self.maxr = 0, 100
+
+    def setRange(self, minimum, maximum):
+        self.minr, self.maxr = minimum, maximum
+
+    def wheelEvent(self, event) -> None:
+        if event.angleDelta().y() > 0:
+            if not (self.currentVolume + 1) > self.maxr:
+                self.currentVolume += 1
+        else:
+            if not (self.currentVolume - 1) < self.minr:
+                self.currentVolume -= 1
+        self.onValueChanged.emit(self.currentVolume)
+        self.setToolTip(str(self.currentVolume))
+        PlayerPanelButton.wheelEvent(self, event)
 
 
 class DropDownMenu(QtWidgets.QMenu):
