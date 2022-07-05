@@ -1,5 +1,5 @@
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt, pyqtSignal, QSize
+from PyQt5.QtCore import Qt, pyqtSignal, QSize, QPoint
 from PyQt5.QtGui import QPixmap, QIcon
 from .uilib.util import setElide, mask_image_rndcb, shadowify
 
@@ -165,6 +165,20 @@ class Seekbar(QtWidgets.QSlider):
         QtWidgets.QSlider.mouseReleaseEvent(self, ev)
 
 
+class ToolTip(QtWidgets.QFrame):
+    def __init__(self, p, text="Placeholder"):
+        super(ToolTip, self).__init__(p)
+        self.text = QtWidgets.QLabel(self)
+        self.text.setAlignment(Qt.AlignCenter)
+        self.setWindowFlags(Qt.ToolTip)
+        self.setText(text)
+
+    def setText(self, text):
+        self.text.setText(text)
+        self.text.adjustSize()
+        self.setFixedSize(self.text.size())
+
+
 class ScrollableButton(PlayerPanelButton):
     onValueChanged = pyqtSignal(int)
 
@@ -172,9 +186,21 @@ class ScrollableButton(PlayerPanelButton):
         super(ScrollableButton, self).__init__(*args, **kwargs)
         self.currentVolume = 50
         self.minr, self.maxr = 0, 100
+        self.tooltip = ToolTip(self)
 
     def setRange(self, minimum, maximum):
         self.minr, self.maxr = minimum, maximum
+
+    def enterEvent(self, a0) -> None:
+        self.tooltip.setText(str(self.currentVolume))
+        self.tooltip.show()
+        self.tooltip.move(self.mapToGlobal(QPoint(self.pos().x() + (self.width() // 2) - (self.tooltip.width() // 2)
+                                                  - 5, self.pos().y() - 45)))
+        PlayerPanelButton.enterEvent(self, a0)
+
+    def leaveEvent(self, a0) -> None:
+        self.tooltip.hide()
+        PlayerPanelButton.leaveEvent(self, a0)
 
     def wheelEvent(self, event) -> None:
         if event.angleDelta().y() > 0:
@@ -184,7 +210,7 @@ class ScrollableButton(PlayerPanelButton):
             if not (self.currentVolume - 1) < self.minr:
                 self.currentVolume -= 1
         self.onValueChanged.emit(self.currentVolume)
-        self.setToolTip(str(self.currentVolume))
+        self.tooltip.setText(str(self.currentVolume))
         PlayerPanelButton.wheelEvent(self, event)
 
 

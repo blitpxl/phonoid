@@ -2,6 +2,9 @@ from .ui.mainwindow import MainWindow
 from .ui.widgets import TrackItem
 from .avlc import AudioPlayer, AudioPlayerEvent, AvlcMedia, ms2min
 from .scanner import LibraryScanner
+from .serializer import serialize_library
+
+from os.path import expanduser, join
 from typing import Union
 from PyQt5.QtCore import QThreadPool
 
@@ -14,7 +17,10 @@ class Application(MainWindow):
     def __init__(self, p):
         super(Application, self).__init__(p)
         self.threadPool = QThreadPool(self)
+        self.threadPool.setMaxThreadCount(1000)
         self.audioPlayer: Union[AudioPlayer, None] = None
+
+        self.closingQueue.append(self.serialize)
 
         self.init_player()
         self.scan_library()
@@ -32,6 +38,10 @@ class Application(MainWindow):
         self.playerPanelLayout.playerControllerFrame.previousButton.clicked.connect(self.on_previous)
         self.playerPanelLayout.playerControllerFrame.fastForward.clicked.connect(self.on_fast_forward)
         self.playerPanelLayout.playerControllerFrame.rewind.clicked.connect(self.on_rewind)
+        self.playerPanelLayout.playbackControllerFrame.equalizerButton.clicked.connect(self.open_equalizer)
+
+    def open_equalizer(self):
+        self.equalizer_dialog.show()
 
     def on_play_pause(self):
         self.audioPlayer.pause()
@@ -61,7 +71,7 @@ class Application(MainWindow):
 
     def scan_library(self):
         self.libraryPage.closeEmptyPrompt()
-        libraryScanner = LibraryScanner(self.audioPlayer, "C:/Users/Kevin/Music/demo")
+        libraryScanner = LibraryScanner(self.audioPlayer, join(expanduser("~"), "Music"))
         libraryScanner.signal.scanned.connect(self.library_add_track)
         self.threadPool.start(libraryScanner)
 
@@ -87,3 +97,6 @@ class Application(MainWindow):
         self.playerPanelLayout.playerInfoFrame.setTitle(title)
         self.playerPanelLayout.playerInfoFrame.setArtist(artist)
         self.playerPanelLayout.seekbarFrame.seekbar.setRange(0, duration)
+
+    def serialize(self):
+        serialize_library(self.audioPlayer.mediaList, "conf/library.json")

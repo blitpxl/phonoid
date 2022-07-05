@@ -66,7 +66,7 @@ QComboBox QListView {
 
 /* Top level window */
 
-QPushButton#main-window {
+QFrame#main-window {
     background: #212423;
     border: 1px solid #4F5654;
     border-radius: 8px;
@@ -112,6 +112,19 @@ QToolTip {
     color: white;
     font-size: 12px;
     border: 1px solid #4F5654;
+    padding: 4px;
+}
+
+ToolTip {
+    background: #212423;
+    color: white;
+    font-size: 12px;
+    border: 1px solid #4F5654;
+    border-radius: 4px;
+}
+
+ToolTip QLabel {
+    margin: 8px;
 }
 
 

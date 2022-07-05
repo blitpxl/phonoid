@@ -57,11 +57,11 @@ class PlayerControllerFrame(QtWidgets.QFrame):
         self.setFixedSize(168, 34)
         self.setObjectName("player-controller-frame")
 
-        self.previousButton = PlayerPanelButton(16, QIcon("res/icons/skipback.svg"), "", self)
-        self.rewind = PlayerPanelButton(16, QIcon("res/icons/rewind.svg"), "", self)
         self.playPause = PlayerPanelButton(24, QIcon("res/icons/play.svg"), "", self)
-        self.fastForward = PlayerPanelButton(16, QIcon("res/icons/forward.svg"), "", self)
+        self.previousButton = PlayerPanelButton(16, QIcon("res/icons/skipback.svg"), "", self)
         self.nextButton = PlayerPanelButton(16, QIcon("res/icons/skipforward.svg"), "", self)
+        self.rewind = PlayerPanelButton(16, QIcon("res/icons/rewind.svg"), "", self)
+        self.fastForward = PlayerPanelButton(16, QIcon("res/icons/forward.svg"), "", self)
 
         self.rewind.setAutoRepeat(True)
         self.rewind.setAutoRepeatDelay(500)
@@ -73,7 +73,12 @@ class PlayerControllerFrame(QtWidgets.QFrame):
 
         for button in self.findChildren(QtWidgets.QPushButton):
             button.setFixedSize(30, 30)
-            self.hlay.addWidget(button)
+
+        self.hlay.addWidget(self.rewind)
+        self.hlay.addWidget(self.previousButton)
+        self.hlay.addWidget(self.playPause)
+        self.hlay.addWidget(self.nextButton)
+        self.hlay.addWidget(self.fastForward)
 
         shadowify(self)
 

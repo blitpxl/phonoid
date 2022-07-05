@@ -136,7 +136,7 @@ class LibraryPage(Page):
                     for item in self.items:
                         self.signal.showItem.emit(item)
                         self.signal.addItemToLayout.emit(item)
-                        time.sleep(0.01)
+                        time.sleep(0.01)    # bit of a delay so it won't hog the cpu
 
         self.running_search_thread = SearchTrack()
         task = self.running_search_thread

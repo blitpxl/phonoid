@@ -9,31 +9,61 @@ import os
 class AvlcMedia:
 
     pafy_obj = None
-    # make the pafy module a singleton and dont import if not needed
-    # pafy takes a lot of memory to impor,t so it will be imported automatically when needed
+    # make the pafy module a singleton and don't import if not needed
+    # pafy takes a lot of memory to import, so it will be imported automatically when needed
 
-    def __init__(self, location, mediaType, vlcInstance):
-        self.location = location
-        self.mediaType = mediaType
-        self.filename = os.path.basename(os.path.splitext(location)[0])
-        self.duration = None
-        self.title = None
-        self.artist = None
-        self.album = None
-        self.art = None
-        self.genre = None
-        self.channel = None
-        self.category = None
-        self.dateAdded = datetime.datetime.now().timestamp()
+    def __init__(self, location, media_type, vlcInstance, *args):
+        if len(args) == 0:
+            self.location = location
+            self.mediaType = media_type
+            self.filename = os.path.basename(os.path.splitext(location)[0])
+            self.duration = None
+            self.title = None
+            self.artist = None
+            self.album = None
+            self.art = None
+            self.genre = None
+            self.channel = None
+            self.category = None
+            self.dateAdded = datetime.datetime.now().timestamp()
+        else:
+            self.location = args[0]
+            self.mediaType = args[1]
+            self.filename = args[2]
+            self.duration = args[3]
+            self.title = args[4]
+            self.artist = args[5]
+            self.album = args[6]
+            self.art = args[7]
+            self.genre = args[8]
+            self.channel = args[9]
+            self.category = args[10]
+            self.dateAdded = args[11]
 
-        if mediaType == "local":
-            self.vlcMediaObject = vlcInstance.media_new(location)
+        if self.mediaType == "local":
+            self.vlcMediaObject = vlcInstance.media_new(self.location)
         else:
             self._import_pafy()
-            self.p = self._get_pafy().new(location)
+            self.p = self._get_pafy().new(self.location)
             import pafy
             a = self.p.getbest()
             self.vlcMediaObject = vlcInstance.media_new(a.url)
+
+    def get_meta_as_dict(self):
+        return {
+            "location": self.location,
+            "type": self.mediaType,
+            "filename": self.filename,
+            "duration": self.duration,
+            "title": self.title,
+            "artist": self.artist,
+            "album": self.album,
+            "art": self.art,
+            "genre": self.genre,
+            "channel": self.channel,
+            "category": self.category,
+            "date": self.dateAdded
+        }
 
     def connect_event(self, event, function):
         if hasattr(event, "functionQueue"):

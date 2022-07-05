@@ -12,10 +12,7 @@ import warnings
 import vlc
 
 
-class AudioPlayer(object):
-
-    # set_lib(get_local_file("dll/libvlc.dll"))
-
+class AudioPlayer:
     def __init__(self, *vlcArgs):
         super(AudioPlayer, self).__init__()
         self.vlcInstanceArgs = [*vlcArgs]

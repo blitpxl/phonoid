@@ -85,7 +85,7 @@ class TitleBar(QtWidgets.QFrame):
         QtWidgets.QFrame.mouseReleaseEvent(self, a0)
 
 
-class Window(QPushButton):  # I know it doesn't make sense to subclass a button, but everything didn't work except this
+class Window(QtWidgets.QFrame):
     onMove = pyqtSignal(QPoint)
 
     def __init__(self, p, width: int = 640, height: int = 480):
@@ -235,8 +235,10 @@ class WindowContainer(QWidget):
         self.opacityAnimation.setStartValue(1.0)
         self.opacityAnimation.setEndValue(0.0)
         self.opacityAnimation.setEasingCurve(QEasingCurve.InCubic)
+        self.opacityAnimation.finished.connect(self.cleanup)
         self.opacityAnimation.start()
 
+    def cleanup(self):
         for item in self.windowObject.closingQueue:
             if isinstance(item, QObject):
                 item.close()
@@ -296,6 +298,9 @@ class Dialog(Window):
         self.titlebar.windowNotch.setTitle("Dialog")
         self.titlebar.hlay.removeWidget(self.titlebar.minimizeButton)
         del self.titlebar.minimizeButton
+        self.titlebar.hlay.removeWidget(self.titlebar.sizeButton)
+        del self.titlebar.sizeButton
+
         self.mainLayout = QtWidgets.QVBoxLayout(self)
         self.mainLayout.setContentsMargins(32, 35, 32, 8)
         self.dialogButtonLayout = QtWidgets.QHBoxLayout(self)
