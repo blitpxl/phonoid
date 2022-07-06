@@ -1,5 +1,7 @@
 ![Phonoid's User Interface](https://i.ibb.co/HdSC9VV/Phonoid.png)
 
+![Phonoid running on Windows 10](https://i.ibb.co/SQ6LvKx/Screenshot-490.png)
+
 # About
 Phonoid is a desktop music player written in Python + Qt5 solely
 with a main purpose of providing a feature-rich music player with simple/minimalistic and cross-platform user interface.
