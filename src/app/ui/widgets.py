@@ -129,15 +129,58 @@ class PlaylistItem(QtWidgets.QFrame):
         setElide(self.duration, f"{duration} long")
 
 
-class PlayerPanelButton(QtWidgets.QPushButton):
+class ControlButton(QtWidgets.QPushButton):
     def __init__(self, iconSize=16, *args, **kwargs):
-        super(PlayerPanelButton, self).__init__(*args, **kwargs)
+        super(ControlButton, self).__init__(*args, **kwargs)
         self.iconSize = iconSize
         self.setIconSize(QSize(iconSize, iconSize))
 
     def changeIcon(self, newIconPath):
         self.setIcon(QIcon(newIconPath))
         self.setIconSize(QSize(self.iconSize, self.iconSize))
+
+
+class PlaybackModeControlButton(ControlButton):
+    onStateChanged = pyqtSignal(int)
+
+    """
+    normal = 0
+    repeatTrack = 1
+    shuffle = 2
+    repeatPlaylist = 3
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(PlaybackModeControlButton, self).__init__(*args, **kwargs)
+        self.current_state = 0
+        self.clicked.connect(self.change_state)
+
+    def set_state(self, state: int):
+        self.current_state = state
+        self.update_icon()
+        self.onStateChanged.emit(self.current_state)
+
+    def change_state(self):
+        if self.current_state < 3:
+            self.current_state += 1
+        else:
+            self.current_state = 0
+        self.update_icon()
+        self.onStateChanged.emit(self.current_state)
+
+    def update_icon(self):
+        if self.current_state == 0:
+            self.changeIcon("res/icons/repeatoff.svg")
+            self.setToolTip("Repeat off")
+        elif self.current_state == 1:
+            self.changeIcon("res/icons/repeatone.svg")
+            self.setToolTip("Repeat this track")
+        elif self.current_state == 2:
+            self.changeIcon("res/icons/shuffle.svg")
+            self.setToolTip("Shuffle")
+        else:
+            self.changeIcon("res/icons/repeat")
+            self.setToolTip("Repeat on")
 
 
 class Seekbar(QtWidgets.QSlider):
@@ -179,7 +222,7 @@ class ToolTip(QtWidgets.QFrame):
         self.setFixedSize(self.text.size())
 
 
-class ScrollableButton(PlayerPanelButton):
+class ScrollableButton(ControlButton):
     onValueChanged = pyqtSignal(int)
 
     def __init__(self, *args, **kwargs):
@@ -196,11 +239,11 @@ class ScrollableButton(PlayerPanelButton):
         self.tooltip.show()
         self.tooltip.move(self.mapToGlobal(QPoint(self.pos().x() + (self.width() // 2) - (self.tooltip.width() // 2)
                                                   - 5, self.pos().y() - 45)))
-        PlayerPanelButton.enterEvent(self, a0)
+        ControlButton.enterEvent(self, a0)
 
     def leaveEvent(self, a0) -> None:
         self.tooltip.hide()
-        PlayerPanelButton.leaveEvent(self, a0)
+        ControlButton.leaveEvent(self, a0)
 
     def wheelEvent(self, event) -> None:
         if event.angleDelta().y() > 0:
@@ -211,7 +254,7 @@ class ScrollableButton(PlayerPanelButton):
                 self.currentVolume -= 1
         self.onValueChanged.emit(self.currentVolume)
         self.tooltip.setText(str(self.currentVolume))
-        PlayerPanelButton.wheelEvent(self, event)
+        ControlButton.wheelEvent(self, event)
 
 
 class DropDownMenu(QtWidgets.QMenu):

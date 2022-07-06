@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSize, Qt
-from .widgets import PlayerPanelButton, ScrollableButton, Seekbar
+from .widgets import ControlButton, ScrollableButton, Seekbar, PlaybackModeControlButton
 from .uilib.util import mask_image_circ, shadowify, setElide
 
 
@@ -57,11 +57,11 @@ class PlayerControllerFrame(QtWidgets.QFrame):
         self.setFixedSize(168, 34)
         self.setObjectName("player-controller-frame")
 
-        self.playPause = PlayerPanelButton(24, QIcon("res/icons/play.svg"), "", self)
-        self.previousButton = PlayerPanelButton(16, QIcon("res/icons/skipback.svg"), "", self)
-        self.nextButton = PlayerPanelButton(16, QIcon("res/icons/skipforward.svg"), "", self)
-        self.rewind = PlayerPanelButton(16, QIcon("res/icons/rewind.svg"), "", self)
-        self.fastForward = PlayerPanelButton(16, QIcon("res/icons/forward.svg"), "", self)
+        self.playPause = ControlButton(24, QIcon("res/icons/play.svg"), "", self)
+        self.previousButton = ControlButton(16, QIcon("res/icons/skipback.svg"), "", self)
+        self.nextButton = ControlButton(16, QIcon("res/icons/skipforward.svg"), "", self)
+        self.rewind = ControlButton(16, QIcon("res/icons/rewind.svg"), "", self)
+        self.fastForward = ControlButton(16, QIcon("res/icons/forward.svg"), "", self)
 
         self.rewind.setAutoRepeat(True)
         self.rewind.setAutoRepeatDelay(500)
@@ -94,8 +94,9 @@ class PlaybackControllerFrame(QtWidgets.QFrame):
         self.setObjectName("playback-controller-frame")
 
         self.volumeButton = ScrollableButton(16, QIcon("res/icons/volume.svg"), "", self)
-        self.repeatButton = QtWidgets.QPushButton(QIcon("res/icons/repeat.svg"), "", self)
-        self.equalizerButton = QtWidgets.QPushButton(QIcon("res/icons/equalizer.svg"), "", self)
+        self.playbackModeButton = PlaybackModeControlButton(16, QIcon("res/icons/repeatoff.svg"), "", self)
+        self.playbackModeButton.set_state(0)
+        self.equalizerButton = ControlButton(16, QIcon("res/icons/equalizer.svg"), "", self)
 
         for button in self.findChildren(QtWidgets.QPushButton):
             button.setIconSize(QSize(16, 16))

@@ -32,13 +32,17 @@ class Application(MainWindow):
         self.audioPlayer.connect_event(AudioPlayerEvent.TrackEndReached, self.on_track_changed)
 
         self.playerPanelLayout.seekbarFrame.seekbar.seek.connect(self.audioPlayer.set_position)
-        self.playerPanelLayout.playbackControllerFrame.volumeButton.onValueChanged.connect(self.audioPlayer.set_volume)
         self.playerPanelLayout.playerControllerFrame.playPause.clicked.connect(self.on_play_pause)
         self.playerPanelLayout.playerControllerFrame.nextButton.clicked.connect(self.on_next)
         self.playerPanelLayout.playerControllerFrame.previousButton.clicked.connect(self.on_previous)
         self.playerPanelLayout.playerControllerFrame.fastForward.clicked.connect(self.on_fast_forward)
         self.playerPanelLayout.playerControllerFrame.rewind.clicked.connect(self.on_rewind)
+
+        self.playerPanelLayout.playbackControllerFrame.volumeButton.onValueChanged.connect(self.audioPlayer.set_volume)
         self.playerPanelLayout.playbackControllerFrame.equalizerButton.clicked.connect(self.open_equalizer)
+        self.playerPanelLayout.playbackControllerFrame.playbackModeButton.onStateChanged.connect(
+            self.playback_mode_changed
+        )
 
     def open_equalizer(self):
         self.equalizer_dialog.show()
@@ -63,6 +67,9 @@ class Application(MainWindow):
 
     def on_rewind(self):
         self.audioPlayer.set_position(self.audioPlayer.get_position() - 5000)
+
+    def playback_mode_changed(self, mode):
+        self.audioPlayer.set_playback_mode(mode)
 
     def library_add_track(self, media: AvlcMedia):
         track = TrackItem(self, media)
