@@ -6,6 +6,9 @@
 Phonoid is a desktop music player written in Python + Qt5 solely
 with a main purpose of providing a feature-rich music player with simple/minimalistic and cross-platform user interface.
 
+# Status
+Phonoid is in the middle of a rewrite as of now. Migrating from Python -> C++ and QtWidgets -> QML to support hardware rendering.
+
 # Support
 Your funds will go towards buying domain and my personal needs to maintain this software. Consider supporting me via:
 
