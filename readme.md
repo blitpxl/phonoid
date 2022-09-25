@@ -9,6 +9,9 @@ with a main purpose of providing a feature-rich music player with simple/minimal
 # Status
 Phonoid is in the middle of a rewrite as of now. Migrating from Python -> C++ and QtWidgets -> QML to support hardware rendering.
 
+Though, you can still try the current python version.
+By default, it will scan your music folder `(C:/Users/*Username*/Music)` for audio files. You can't change it just yet (unless you edit the source code.)
+
 # Support
 Your funds will go towards buying domain and my personal needs to maintain this software. Consider supporting me via:
 
@@ -17,10 +20,6 @@ Your funds will go towards buying domain and my personal needs to maintain this 
 - [Ko-Fi](https://ko-fi.com/vinrato)
 
 [comment]: <> (✓)
-
-# Status
-Phonoid is still under heavy development with the state of the UI 60% done. Music playback functionality is fully implemented, so you can go and play around with it.
-By default, it will scan your music folder `(C:/Users/*Username*/Music)` for audio files. You can't change it just yet (unless you edit the source code.)
 
 Phonoid targets Windows, Linux, and macOS, but for now I'm focusing my attention on Windows and try to optimize it.
 
